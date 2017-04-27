@@ -3,7 +3,12 @@
     <state version="4" enabled="true" />
     <globalmarks />
     <filemarks>
-      <file name="$USER_HOME$/CLionProjects/untitled2/cmake-build-debug/CMakeFiles/clion-log.txt" timestamp="1493314755896" />
+      <file name="/Doxygen Fragment (poly.h:0).doxygen" timestamp="1493326280125">
+        <mark key="[" line="0" column="0" />
+      </file>
+      <file name="$USER_HOME$/CLionProjects/Zaliczeniowy/src/poly.h" timestamp="1493326255237">
+        <mark key="[" line="3" column="46" />
+      </file>
     </filemarks>
     <jumps />
     <registers />
