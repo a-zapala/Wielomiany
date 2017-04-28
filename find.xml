@@ -1,7 +1,7 @@
 <application>
   <component name="FindSettings">
-    <option name="customScope" value="Project 'wielomiany'" />
-    <option name="defaultScopeName" value="Project 'wielomiany'" />
-    <option name="SEARCH_SCOPE" value="Project 'wielomiany'" />
+    <option name="customScope" value="File '[Zaliczeniowy] - ...\src\list.c'" />
+    <option name="defaultScopeName" value="File '[Zaliczeniowy] - ...\src\list.c'" />
+    <option name="SEARCH_SCOPE" value="File '[Zaliczeniowy] - ...\src\list.c'" />
   </component>
 </application>
