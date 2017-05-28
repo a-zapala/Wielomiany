@@ -284,6 +284,53 @@ void makeLine(char *line, char **arrayOfComand, Stack *stack, int row)
                 break;
 
 
+            case 14:
+
+            {
+                if (parseComposeArgument(line))  //oprocz komendy musimy sparsowac argument
+                {
+                    int index=8;
+                    unsigned int count = (unsigned int) readNumber(line, &index);
+
+                    if (size(stack) < count+1 )
+                    {
+                        fprintf(stderr,"ERROR %d WRONG COUNT\n", row); //TODO lub STACKUNDERVLOW
+                    }
+                    else
+                    {
+                        Poly poly = pop(stack);
+
+                        Poly *polys=(Poly*)malloc(sizeof(Poly)*count);
+
+                        for(int i=0 ; i<count ;i++)
+                        {
+                            polys[i]=pop(stack);
+                        }
+
+                        Poly newPoly=PolyCompose(&poly,count,polys);
+
+                        for(int i=0;i<count;i++)
+                        {
+                            PolyDestroy(&(polys[i]));
+                        }
+
+                        PolyDestroy(&poly);
+                        free(polys);
+
+                        push(newPoly,stack);
+
+                    }
+
+                }
+                else
+                {
+                    fprintf(stderr,"ERROR %d WRONG COUNT\n", row);
+                }
+            }
+
+            break;
+
+
             case -1:
                 fprintf(stderr,"ERROR %d WRONG COMMAND\n", row);
                 break;

@@ -51,7 +51,8 @@ static void PolyRealloc(Poly *p)
         PolyDestroy(p);
         p->coeff = 0;
     }
-    else if (PolyLen(p) == 1 && p->arr[0].exp == 0 && PolyIsCoeff(&p->arr[0].p)) {
+    else if (PolyLen(p) == 1 && p->arr[0].exp == 0 && PolyIsCoeff(&p->arr[0].p))
+    {
         p->coeff = p->arr[0].p.coeff;
         free(p->arr);
         p->arr = NULL;
@@ -59,8 +60,8 @@ static void PolyRealloc(Poly *p)
     else if (PolyLen(p) == 1 && PolyIsZero(&(p->arr[0].p))) //wprowadzona zmiana by Andrzej Zapała
     {
         PolyDestroy(p);
-        p->arr=NULL;
-        p->coeff=0;
+        p->arr = NULL;
+        p->coeff = 0;
     }
     else
     {
@@ -72,7 +73,9 @@ static void PolyRealloc(Poly *p)
 void PolyDestroy(Poly *p)
 {
     if (PolyIsCoeff(p))
+    {
         return;
+    }
     for (unsigned i = 0; i < PolyLen(p); ++i)
         MonoDestroy(&p->arr[i]);
     free(p->arr);
@@ -82,7 +85,9 @@ void PolyDestroy(Poly *p)
 Poly PolyClone(const Poly *p)
 {
     if (PolyIsCoeff(p))
+    {
         return *p;
+    }
     Poly r = PolyAlloc(p->size);
     for (unsigned i = 0; i < PolyLen(p); ++i)
         r.arr[i] = MonoClone(&p->arr[i]);
@@ -101,7 +106,9 @@ static Poly PolyAddPolyCoeff(const Poly *p, poly_coeff_t c)
 {
     assert(PolyLen(p) > 0);
     if (c == 0)
+    {
         return PolyClone(p);
+    }
     else if (p->arr[0].exp == 0)
     {
         Poly r0 = PolyAddCoeff(&p->arr[0].p, c);
@@ -145,9 +152,13 @@ static Poly PolyAddPolyCoeff(const Poly *p, poly_coeff_t c)
 static Poly PolyAddCoeff(const Poly *p, poly_coeff_t c)
 {
     if (PolyIsCoeff(p))
+    {
         return PolyFromCoeff(p->coeff + c);
+    }
     else
+    {
         return PolyAddPolyCoeff(p, c);
+    }
 }
 
 /**
@@ -179,9 +190,11 @@ static Poly PolyAddPolyPoly(const Poly *p, const Poly *q)
         else
         {
             Mono m = (Mono) {.p = PolyAdd(&p->arr[i++].p, &q->arr[j++].p),
-                             .exp = pe};
+                    .exp = pe};
             if (!PolyIsZero(&m.p))
+            {
                 r.arr[k++] = m;
+            }
         }
     }
     r.size = k;
@@ -192,11 +205,17 @@ static Poly PolyAddPolyPoly(const Poly *p, const Poly *q)
 Poly PolyAdd(const Poly *p, const Poly *q)
 {
     if (PolyIsCoeff(p))
+    {
         return PolyAddCoeff(q, p->coeff);
+    }
     else if (PolyIsCoeff(q))
+    {
         return PolyAddCoeff(p, q->coeff);
+    }
     else
+    {
         return PolyAddPolyPoly(p, q);
+    }
 }
 
 /**
@@ -221,7 +240,7 @@ Poly PolyAddMonos(unsigned count, const Mono monos[])
     {
         if (k == 0 || arr[i].exp != arr[k - 1].exp)
         {
-            assert(!PolyIsZero(&arr[i].p));
+//            assert(!PolyIsZero(&arr[i].p));
             arr[k++] = arr[i];
         }
         else
@@ -230,9 +249,13 @@ Poly PolyAddMonos(unsigned count, const Mono monos[])
             PolyDestroy(&arr[k - 1].p);
             PolyDestroy(&arr[i].p);
             if (PolyIsZero(&m.p))
+            {
                 k--;
+            }
             else
+            {
                 arr[k - 1] = m;
+            }
         }
     }
     Poly r = (Poly) {.size = k, .arr = arr};
@@ -249,12 +272,12 @@ Poly PolyAddMonos(unsigned count, const Mono monos[])
 static Poly PolyMulPolyPoly(const Poly *p, const Poly *q)
 {
     unsigned count = PolyLen(p) * PolyLen(q);
-    Mono  * arr = calloc(count, sizeof(struct Mono));
+    Mono *arr = calloc(count, sizeof(struct Mono));
     unsigned k = 0;
     for (unsigned i = 0; i < PolyLen(p); ++i)
         for (unsigned j = 0; j < PolyLen(q); ++j)
             arr[k++] = (Mono) {.p = PolyMul(&p->arr[i].p, &q->arr[j].p),
-                               .exp = p->arr[i].exp + q->arr[j].exp};
+                    .exp = p->arr[i].exp + q->arr[j].exp};
     Poly res = PolyAddMonos(count, arr);
     free(arr);
     return res;
@@ -271,15 +294,19 @@ static Poly PolyMulCoeff(const Poly *p, poly_coeff_t c);
 static Poly PolyMulPolyCoeff(const Poly *p, poly_coeff_t c)
 {
     if (c == 0)
+    {
         return PolyZero();
+    }
     Poly r = PolyAlloc(PolyLen(p));
     r.size = 0;
     for (unsigned i = 0; i < PolyLen(p); ++i)
     {
         Mono m = (Mono) {.p = PolyMulCoeff(&p->arr[i].p, c),
-                         .exp = p->arr[i].exp};
+                .exp = p->arr[i].exp};
         if (!PolyIsZero(&m.p))
+        {
             r.arr[r.size++] = m;
+        }
     }
     PolyRealloc(&r);
     return r;
@@ -294,19 +321,29 @@ static Poly PolyMulPolyCoeff(const Poly *p, poly_coeff_t c)
 static Poly PolyMulCoeff(const Poly *p, poly_coeff_t c)
 {
     if (PolyIsCoeff(p))
+    {
         return PolyFromCoeff(p->coeff * c);
+    }
     else
+    {
         return PolyMulPolyCoeff(p, c);
+    }
 }
 
 Poly PolyMul(const Poly *p, const Poly *q)
 {
     if (PolyIsCoeff(p))
+    {
         return PolyMulCoeff(q, p->coeff);
+    }
     else if (PolyIsCoeff(q))
+    {
         return PolyMulCoeff(p, q->coeff);
+    }
     else
+    {
         return PolyMulPolyPoly(p, q);
+    }
 }
 
 Poly PolyNeg(const Poly *p)
@@ -339,7 +376,9 @@ poly_exp_t PolyDegBy(const Poly *p, unsigned var_idx)
         {
             poly_exp_t d = PolyDegBy(&p->arr[i].p, var_idx - 1);
             if (d > deg)
+            {
                 deg = d;
+            }
         }
         return deg;
     }
@@ -358,7 +397,9 @@ poly_exp_t PolyDeg(const Poly *p)
         {
             poly_exp_t d = PolyDeg(&p->arr[i].p) + p->arr[i].exp;
             if (d > deg)
+            {
                 deg = d;
+            }
         }
         return deg;
     }
@@ -383,7 +424,9 @@ bool PolyIsEq(const Poly *p, const Poly *q)
         for (unsigned i = 0; i < PolyLen(p); ++i)
             if (p->arr[i].exp != q->arr[i].exp ||
                 !PolyIsEq(&p->arr[i].p, &q->arr[i].p))
+            {
                 return false;
+            }
         return true;
     }
 }
@@ -398,9 +441,13 @@ bool PolyIsEq(const Poly *p, const Poly *q)
 static poly_coeff_t PowHelp(poly_coeff_t a, poly_coeff_t b, poly_exp_t n)
 {
     if (n == 0)
+    {
         return a;
+    }
     else
+    {
         return PowHelp(n % 2 == 0 ? a : a * b, b * b, n / 2);
+    }
 }
 
 /**
@@ -417,7 +464,9 @@ static inline poly_coeff_t Pow(poly_coeff_t a, poly_exp_t n)
 Poly PolyAt(const Poly *p, poly_coeff_t x)
 {
     if (PolyIsCoeff(p))
+    {
         return PolyClone(p);
+    }
     Poly r = PolyZero();
     poly_exp_t n = 0;
     poly_coeff_t x_to_n = 1;
@@ -433,3 +482,50 @@ Poly PolyAt(const Poly *p, poly_coeff_t x)
     }
     return r;
 }
+
+
+Poly PolyPower(const Poly *p, poly_exp_t power) //mnozymy na pale
+{
+    Poly currentPoly;
+    Poly prevPoly = PolyFromCoeff(1);
+
+    for (unsigned i = 0; i < power; i++)
+    {
+        currentPoly = PolyMul(&prevPoly, p);
+        prevPoly = currentPoly;
+    }
+
+    return prevPoly;
+}
+
+Poly PolyCompose(const Poly *p, unsigned count, const Poly x[])
+{
+    if (PolyIsCoeff(p))
+    {
+        return *p;
+    }
+    else if (count == 0)
+    {
+        return PolyZero();
+    }
+    else
+    {
+        Poly currentPoly = x[0];
+        Poly resultPoly = PolyFromCoeff(0);
+
+        for (unsigned i = 0; i < p->size; i++) //iteruje po jednomianach w liscie
+        {
+            Poly monoCompose = PolyCompose(&(((p->arr) + i)->p), count - 1, x +
+                                                                            1); //przesuwam indeks tablicy zmniejszajac count, podaje do PolyComposeAncillary wielomian
+            //odpowiedniego jednomianu
+            Poly powCurrentPoly = PolyPower(&currentPoly, ((p->arr) + i)->exp); //podnoze do potegi wykladnik
+
+            Poly polyComposeFromMono = PolyMul(&powCurrentPoly, &monoCompose);
+
+            resultPoly = PolyAdd(&resultPoly, &polyComposeFromMono);
+        }
+
+        return resultPoly;
+    }
+}
+

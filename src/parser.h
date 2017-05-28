@@ -53,4 +53,6 @@ char **createArrayCommand();
  */
 int parseCommand(char *line, char **arrayOfCommand);
 
+bool parseComposeArgument(const char *line);
+
 #endif //WIELOMIANY_PARSER_H

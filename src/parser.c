@@ -13,7 +13,7 @@
 #include "parser.h"
 #include <limits.h>
 
-#define NUMBER_OF_COMAND 14
+#define NUMBER_OF_COMAND 15
 
 bool parseMono(const char *line, int *column);
 
@@ -303,6 +303,11 @@ bool parsedegByArrgument(const char *line)
     }
 }
 
+bool parseComposeArgument(const char *line) //funkcja analogiczna do parsedegByArrgument
+{                                           //TODO mozna poprawic aby była jedna
+    return parsedegByArrgument(line+1);
+}
+
 bool parsedAtArrgument(const char *line)
 {
     int column=3;
@@ -342,6 +347,7 @@ char **createArrayCommand()
     arrayOfComand[11] = "POP\n";
     arrayOfComand[12] = "DEG_BY ";
     arrayOfComand[13] = "AT ";
+    arrayOfComand[14] ="COMPOSE ";
 
     return arrayOfComand;
 }
@@ -365,6 +371,13 @@ int parseCommand(char *line, char **arrayOfCommand)
     i++;
 
     if(strncmp(line,arrayOfCommand[i],3)==0) //porownuje poczatkowe znak
+    {
+        return i;
+    }
+
+    i++;
+
+    if(strncmp(line,arrayOfCommand[i],8)==0) //dopisanie do compose
     {
         return i;
     }

@@ -220,4 +220,6 @@ bool PolyIsEq(const Poly *p, const Poly *q);
  */
 Poly PolyAt(const Poly *p, poly_coeff_t x);
 
+Poly PolyCompose(const Poly *p, unsigned count, const Poly x[]);
+
 #endif /* __POLY_H__ */
