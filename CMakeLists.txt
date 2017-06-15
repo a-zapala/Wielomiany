@@ -23,11 +23,18 @@ set(CMAKE_C_FLAGS "-std=c11 -Wall -Wextra")
 set(SOURCE_FILES
     src/poly.c
     src/poly.h
-    src/test_poly.c
-)
+    src/calc.c
+        src/stack.c
+        src/stack.h
+        src/writeAndRead.c
+        src/writeAndRead.h
+        src/stack.h
+        src/stack.c
+        src/parser.h
+        src/parser.c)
 
 # Wskazujemy plik wykonywalny.
-add_executable(test_poly ${SOURCE_FILES})
+add_executable(calc ${SOURCE_FILES})
 
 # Dodajemy obsługę Doxygena: sprawdzamy, czy jest zainstalowany i jeśli tak to:
 find_package(Doxygen)
