@@ -42,7 +42,7 @@ void makeLine(char *line, char **arrayOfComand, Stack *stack, int row)
         switch (numberOfCommand)
         {
 
-            case 0:
+            case ZERO:
             {
                 Poly polyZero = PolyZero();
                 push(polyZero, stack);
@@ -50,7 +50,7 @@ void makeLine(char *line, char **arrayOfComand, Stack *stack, int row)
                 break;
 
 
-            case 1:
+            case IS_CEOF:
             {
                 if (size(stack) == 0)
                 {
@@ -65,7 +65,7 @@ void makeLine(char *line, char **arrayOfComand, Stack *stack, int row)
                 break;
 
 
-            case 2:
+            case IS_ZERO:
             {
                 if (size(stack) == 0)
                 {
@@ -80,7 +80,7 @@ void makeLine(char *line, char **arrayOfComand, Stack *stack, int row)
                 break;
 
 
-            case 3:
+            case CLONE:
             {
                 if (size(stack) == 0)
                 {
@@ -96,7 +96,7 @@ void makeLine(char *line, char **arrayOfComand, Stack *stack, int row)
                 break;
 
 
-            case 4:
+            case ADD:
             {
                 if (size(stack) < 2)
                 {
@@ -115,7 +115,7 @@ void makeLine(char *line, char **arrayOfComand, Stack *stack, int row)
                 break;
 
 
-            case 5:
+            case MUL:
             {
                 if (size(stack) < 2)
                 {
@@ -134,7 +134,7 @@ void makeLine(char *line, char **arrayOfComand, Stack *stack, int row)
                 break;
 
 
-            case 6:
+            case NEG:
             {
                 if (size(stack) < 1)
                 {
@@ -151,7 +151,7 @@ void makeLine(char *line, char **arrayOfComand, Stack *stack, int row)
             break;
 
 
-            case 7:
+            case SUB:
             {
                 if (size(stack) < 2)
                 {
@@ -170,7 +170,7 @@ void makeLine(char *line, char **arrayOfComand, Stack *stack, int row)
                 break;
 
 
-            case 8:
+            case IS_EQ:
             {
                 if (size(stack) < 2)
                 {
@@ -188,7 +188,7 @@ void makeLine(char *line, char **arrayOfComand, Stack *stack, int row)
                 break;
 
 
-            case 9:
+            case DEG:
             {
                 if (size(stack) == 0)
                 {
@@ -203,7 +203,7 @@ void makeLine(char *line, char **arrayOfComand, Stack *stack, int row)
                 break;
 
 
-            case 10:
+            case PRINT:
             {
                 if (size(stack) == 0)
                 {
@@ -218,7 +218,7 @@ void makeLine(char *line, char **arrayOfComand, Stack *stack, int row)
                 break;
 
 
-            case 11:
+            case POP:
             {
                 if (size(stack) == 0)
                 {
@@ -233,7 +233,7 @@ void makeLine(char *line, char **arrayOfComand, Stack *stack, int row)
                 break;
 
 
-            case 12:
+            case DEG_BY:
             {
                 if (parsedegByArrgument(line))  //oprocz komendy musimy sparsowac argument
                 {
@@ -258,7 +258,7 @@ void makeLine(char *line, char **arrayOfComand, Stack *stack, int row)
                 break;
 
 
-            case 13:
+            case AT:
             {
                 if (parsedAtArrgument(line)) //tutaj podobnie parsujemy argument
                 {
@@ -284,7 +284,7 @@ void makeLine(char *line, char **arrayOfComand, Stack *stack, int row)
                 break;
 
 
-            case 14:
+            case COMPOSE:
 
             {
                 if (parseComposeArgument(line))  //oprocz komendy musimy sparsowac argument
@@ -302,14 +302,14 @@ void makeLine(char *line, char **arrayOfComand, Stack *stack, int row)
 
                         Poly *polys=(Poly*)malloc(sizeof(Poly)*count);
 
-                        for(int i=0 ; i<count ;i++)
+                        for(unsigned i=0 ; i<count ;i++)
                         {
                             polys[i]=pop(stack);
                         }
 
                         Poly newPoly=PolyCompose(&poly,count,polys);
 
-                        for(int i=0;i<count;i++)
+                        for(unsigned i=0;i<count;i++)
                         {
                             PolyDestroy(&(polys[i]));
                         }

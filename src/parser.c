@@ -13,7 +13,9 @@
 #include "parser.h"
 #include <limits.h>
 
-#define NUMBER_OF_COMAND 15
+#define MAX_LONG_LENTH 19
+#define MAX_INT_LONG 10
+
 
 bool parseMono(const char *line, int *column);
 
@@ -35,8 +37,6 @@ bool recognisePoly(char *line)
         return true;
     }
 }
-
-
 
 /**
  * Funkcja parsuje liste jednomianow
@@ -143,7 +143,7 @@ bool parseCeof(const char *line, int *column)
         sign = 1;
     }
 
-    while (index < 19 && !end) //wczytuje 19 znakow
+    while (index < MAX_LONG_LENTH && !end) //wczytuje 19 znakow
     {
         if (line[*column + index] >= '0' && line[*column + index] <= '9')
         {
@@ -157,12 +157,12 @@ bool parseCeof(const char *line, int *column)
     }
 
 
-    if(index<19 && index>0)
+    if(index<MAX_LONG_LENTH && index>0)
     {
         *column=(*column)+index;
         return true;
     }
-    else if(index==19)
+    else if(index==MAX_LONG_LENTH)
     {
         if(((sign==-1) && ceof > (unsigned long)LONG_MAX+1 )|| ( (sign==1) && ceof > (unsigned long)LONG_MAX))
         {                                                                   //sprawdzan czy liczba z 19 znakami przekroczyła zakres
@@ -206,7 +206,7 @@ bool parseExp(const char *line, int *column)
     {
         return false;
     }
-    while (index < 11 && !end)
+    while (index < MAX_INT_LONG+1 && !end)
     {
         if (line[*column + index] >= '0' && line[*column + index] <= '9')
         {
@@ -219,12 +219,12 @@ bool parseExp(const char *line, int *column)
         }
     }
 
-    if(index<10 && index>0) //wieksze od zera bo jesli nie nie wczytano liczby
+    if(index<MAX_INT_LONG && index>0) //wieksze od zera bo jesli nie nie wczytano liczby
     {
         *column=(*column)+index;
         return true;
     }
-    else if(index==10)
+    else if(index==MAX_INT_LONG)
     {
         if( ceof > UINT_MAX)
         {
@@ -263,7 +263,7 @@ bool parsedegByArrgument(const char *line)
     {
         return false;
     }
-    while (index < 11 && !end)
+    while (index < MAX_INT_LONG+1 && !end)
     {
         if (line[column + index] >= '0' && line[column + index] <= '9')
         {
@@ -282,11 +282,11 @@ bool parsedegByArrgument(const char *line)
     }
     else {
 
-        if (index < 10 && index > 0)
+        if (index < MAX_INT_LONG && index > 0)
         {
             return true;
         }
-        else if (index == 10)
+        else if (index == MAX_INT_LONG)
         {
             if (ceof > UINT_MAX) {
                 return false;
@@ -333,21 +333,21 @@ char **createArrayCommand()
 {
     char **arrayOfComand = (char **) malloc(sizeof(char *) * NUMBER_OF_COMAND);
 
-    arrayOfComand[0] = "ZERO\n";
-    arrayOfComand[1] = "IS_COEFF\n";
-    arrayOfComand[2] = "IS_ZERO\n";
-    arrayOfComand[3] = "CLONE\n";
-    arrayOfComand[4] = "ADD\n";
-    arrayOfComand[5] = "MUL\n";
-    arrayOfComand[6] = "NEG\n";
-    arrayOfComand[7] = "SUB\n";
-    arrayOfComand[8] = "IS_EQ\n";
-    arrayOfComand[9] = "DEG\n";
-    arrayOfComand[10] = "PRINT\n";
-    arrayOfComand[11] = "POP\n";
-    arrayOfComand[12] = "DEG_BY ";
-    arrayOfComand[13] = "AT ";
-    arrayOfComand[14] ="COMPOSE ";
+    arrayOfComand[ZERO] = "ZERO\n";
+    arrayOfComand[IS_CEOF] = "IS_COEFF\n";
+    arrayOfComand[IS_ZERO] = "IS_ZERO\n";
+    arrayOfComand[CLONE] = "CLONE\n";
+    arrayOfComand[ADD] = "ADD\n";
+    arrayOfComand[MUL] = "MUL\n";
+    arrayOfComand[NEG] = "NEG\n";
+    arrayOfComand[SUB] = "SUB\n";
+    arrayOfComand[IS_EQ] = "IS_EQ\n";
+    arrayOfComand[DEG] = "DEG\n";
+    arrayOfComand[PRINT] = "PRINT\n";
+    arrayOfComand[POP] = "POP\n";
+    arrayOfComand[DEG_BY] = "DEG_BY ";
+    arrayOfComand[AT] = "AT ";
+    arrayOfComand[COMPOSE] ="COMPOSE ";
 
     return arrayOfComand;
 }
@@ -356,7 +356,7 @@ int parseCommand(char *line, char **arrayOfCommand)
 {
     int i=0;
 
-    for(i=0;i<NUMBER_OF_COMAND-2;i++)
+    for(i=0;i<NUMBER_OF_COMAND_WITHOUT_PARAMETR ;i++)
     {
         if(strcmp(line,arrayOfCommand[i])==0) //na porownuje jak stringi bo znam konkretne dlugosci tych komend
         {

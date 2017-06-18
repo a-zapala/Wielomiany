@@ -7,11 +7,9 @@
 */
 
 #include "poly.h"
-#include <assert.h>
 #include <limits.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
 
 /** Maksymalna wartość wykładnika wielomianu */
 #define POLY_EXP_MAX INT_MAX
@@ -33,9 +31,7 @@ static inline unsigned PolyLen(const Poly *p)
  */
 static Poly PolyAlloc(unsigned size)
 {
-    assert(size > 0);
     Mono *arr = calloc(size, sizeof(Mono));
-    assert(arr != NULL);
     return (Poly) {.size = size, .arr = arr};
 }
 
@@ -45,7 +41,6 @@ static Poly PolyAlloc(unsigned size)
  */
 static void PolyRealloc(Poly *p)
 {
-    assert(!PolyIsCoeff(p));
     if (PolyLen(p) == 0)
     {
         PolyDestroy(p);
@@ -66,7 +61,6 @@ static void PolyRealloc(Poly *p)
     else
     {
         p->arr = realloc(p->arr, PolyLen(p) * sizeof(Mono));
-        assert(p->arr != NULL);
     }
 }
 
@@ -104,7 +98,6 @@ static Poly PolyAddCoeff(const Poly *p, poly_coeff_t c);
  */
 static Poly PolyAddPolyCoeff(const Poly *p, poly_coeff_t c)
 {
-    assert(PolyLen(p) > 0);
     if (c == 0)
     {
         return PolyClone(p);
@@ -114,7 +107,6 @@ static Poly PolyAddPolyCoeff(const Poly *p, poly_coeff_t c)
         Poly r0 = PolyAddCoeff(&p->arr[0].p, c);
         if (PolyIsZero(&r0))
         {
-            assert(PolyLen(p) > 1);
             Poly r = PolyAlloc(PolyLen(p) - 1);
             for (unsigned i = 0; i < PolyLen(&r); ++i)
                 r.arr[i] = MonoClone(&p->arr[i + 1]);
@@ -169,8 +161,6 @@ static Poly PolyAddCoeff(const Poly *p, poly_coeff_t c)
  */
 static Poly PolyAddPolyPoly(const Poly *p, const Poly *q)
 {
-    assert(PolyLen(p) > 0);
-    assert(PolyLen(q) > 0);
     Poly r = PolyAlloc(PolyLen(p) + PolyLen(q));
     unsigned i = 0, j = 0, k = 0;
     while (i < PolyLen(p) || j < PolyLen(q))
@@ -179,12 +169,10 @@ static Poly PolyAddPolyPoly(const Poly *p, const Poly *q)
         poly_exp_t qe = j < PolyLen(q) ? q->arr[j].exp : POLY_EXP_MAX;
         if (pe < qe)
         {
-            assert(!PolyIsZero(&p->arr[i].p));
             r.arr[k++] = MonoClone(&p->arr[i++]);
         }
         else if (pe > qe)
         {
-            assert(!PolyIsZero(&q->arr[j].p));
             r.arr[k++] = MonoClone(&q->arr[j++]);
         }
         else
@@ -232,7 +220,6 @@ static poly_exp_t MonoCmp(const void *a, const void *b)
 Poly PolyAddMonos(unsigned count, const Mono monos[])
 {
     Mono *arr = calloc(count, sizeof(Mono));
-    assert(arr != NULL);
     memcpy(arr, monos, count * sizeof(Mono));
     qsort(arr, count, sizeof(Mono), MonoCmp);
     unsigned k = 0;
@@ -240,7 +227,6 @@ Poly PolyAddMonos(unsigned count, const Mono monos[])
     {
         if (k == 0 || arr[i].exp != arr[k - 1].exp)
         {
-//            assert(!PolyIsZero(&arr[i].p));
             arr[k++] = arr[i];
         }
         else
@@ -484,45 +470,103 @@ Poly PolyAt(const Poly *p, poly_coeff_t x)
 }
 
 
-Poly PolyPower(const Poly *p, poly_exp_t power) //mnozymy na pale
+Poly PolyPower1(const Poly *p, poly_exp_t power) //wykonujemy mnozenie iterowane
 {
     Poly currentPoly;
     Poly prevPoly = PolyFromCoeff(1);
 
-    for (unsigned i = 0; i < power; i++)
+    for (unsigned i = 0; i < (unsigned) power; i++)
     {
         currentPoly = PolyMul(&prevPoly, p);
+        PolyDestroy(&prevPoly);
         prevPoly = currentPoly;
     }
 
     return prevPoly;
 }
 
+/**
+ * Funkcja zwracajaca wielomian do danej potegi naturalnej nie modyfikujaca podstawy
+ * @param p wielomian podnoszacy do potegi
+ * @param power wykladnik potegi
+ * @return
+ */
+
+Poly PolyPower(const Poly *p, poly_exp_t power) //niby szybciej ale wolniej
+{
+    if (!power)
+    {
+        return PolyFromCoeff(1);
+    }
+
+    if (power % 2 == 1)
+    {
+        Poly pom1 = PolyPower(p, (power - 1) / 2);
+        Poly pom2 = PolyClone(&pom1);
+        Poly pom3 = PolyMul(&pom1, &pom2);
+        Poly pom4 = PolyMul(p, &pom3);
+
+        PolyDestroy(&pom1);
+        PolyDestroy(&pom2);
+        PolyDestroy(&pom3);
+
+        return pom4;
+    }
+    else
+    {
+        Poly pom1 = PolyPower(p, power / 2);
+        Poly pom2 = PolyClone(&pom1);
+        Poly pom3 = PolyMul(&pom1, &pom2);
+
+        PolyDestroy(&pom1);
+        PolyDestroy(&pom2);
+
+        return pom3;
+    }
+}
+
+
 Poly PolyCompose(const Poly *p, unsigned count, const Poly x[])
 {
     if (PolyIsCoeff(p))
     {
-        return *p;
+        return PolyClone(p);
     }
     else if (count == 0)
     {
-        return PolyZero();
+        if (PolyIsCoeff(&(p->arr->p))) //kiedy w liscie jest wielomian stały
+        {
+            return PolyClone(&(p->arr->p));
+        }
+        else
+        {
+            return PolyZero();
+        }
     }
     else
     {
-        Poly currentPoly = x[0];
-        Poly resultPoly = PolyFromCoeff(0);
+        Poly currentPoly = x[0]; //pierwszy wielomian w liscie bedzie aktualnym, robiac rekursje zmniejszamy liste i zmianiamy wskaznik tablicy
+        Poly resultPoly = PolyZero(); //bedziemy dodawac do tego wielomianu wszystkie wielomiany stworzone z jednomianow z listy
 
         for (unsigned i = 0; i < p->size; i++) //iteruje po jednomianach w liscie
         {
             Poly monoCompose = PolyCompose(&(((p->arr) + i)->p), count - 1, x +
-                                                                            1); //przesuwam indeks tablicy zmniejszajac count, podaje do PolyComposeAncillary wielomian
+                                                                            1); //przesuwam indeks tablicy zmniejszajac count, podaje do PolyCompose wielomian
             //odpowiedniego jednomianu
-            Poly powCurrentPoly = PolyPower(&currentPoly, ((p->arr) + i)->exp); //podnoze do potegi wykladnik
+            Poly powCurrentPoly = PolyPower(&currentPoly, ((p->arr) + i)->exp); //podnoszę do potegi
 
             Poly polyComposeFromMono = PolyMul(&powCurrentPoly, &monoCompose);
 
-            resultPoly = PolyAdd(&resultPoly, &polyComposeFromMono);
+
+            Poly pom = PolyAdd(&resultPoly,
+                               &polyComposeFromMono); //dodaje do wynikowego wielomianu tego ktory został policzony w danej iteracji
+
+            PolyDestroy(&polyComposeFromMono);
+            PolyDestroy(&resultPoly);
+            PolyDestroy(&powCurrentPoly);
+            PolyDestroy(&monoCompose);
+
+            resultPoly = pom;
         }
 
         return resultPoly;

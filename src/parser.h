@@ -8,6 +8,24 @@
 #ifndef WIELOMIANY_PARSER_H
 #define WIELOMIANY_PARSER_H
 
+#define ZERO 0
+#define IS_CEOF 1
+#define IS_ZERO 2
+#define CLONE 3
+#define ADD 4
+#define MUL 5
+#define NEG 6
+#define SUB 7
+#define IS_EQ 8
+#define DEG 9
+#define PRINT 10
+#define POP 11
+#define DEG_BY 12
+#define AT 13
+#define COMPOSE 14
+#define NUMBER_OF_COMAND 15
+#define NUMBER_OF_COMAND_WITHOUT_PARAMETR 12
+
 /**
  * Rozpznaje czy parsowac wielomian czy komende
  * @param line : tablica charow
@@ -55,4 +73,4 @@ int parseCommand(char *line, char **arrayOfCommand);
 
 bool parseComposeArgument(const char *line);
 
-#endif //WIELOMIANY_PARSER_H
+#endif // WIELOMIANY_PARSER_H

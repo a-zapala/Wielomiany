@@ -34,7 +34,7 @@ set(SOURCE_FILES
         src/parser.c)
 
 # Wskazujemy plik wykonywalny.
-add_executable(calc ${SOURCE_FILES})
+add_executable(calc_poly ${SOURCE_FILES})
 
 # Dodajemy obsługę Doxygena: sprawdzamy, czy jest zainstalowany i jeśli tak to:
 find_package(Doxygen)
@@ -49,3 +49,26 @@ if (DOXYGEN_FOUND)
         COMMENT "Generating API documentation with Doxygen"
     )
 endif (DOXYGEN_FOUND)
+
+# find_program (CTEST_MEMORYCHECK_COMMAND NAMES valgrind)
+find_library(CMOCKA cmocka)
+
+
+if (NOT CMOCKA)
+    message(FATAL_ERROR "Could not find cmocka.")
+endif ()
+
+enable_testing()
+
+add_executable(unit_test src/unit_test.c src/poly.c )
+
+set_target_properties(
+    unit_test
+    PROPERTIES
+    COMPILE_DEFINITIONS UNIT_TESTING=1)
+
+target_link_libraries(unit_test ${CMOCKA})
+
+add_test(unit_test ${CMAKE_CURRENT_BINARY_DIR}/unit_test)
+
+

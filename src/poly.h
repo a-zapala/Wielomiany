@@ -220,6 +220,13 @@ bool PolyIsEq(const Poly *p, const Poly *q);
  */
 Poly PolyAt(const Poly *p, poly_coeff_t x);
 
+/**
+ *Funkcja PolyCompose zwraca wielomian p, w którym pod zmienną xi podstawiamy wielomian x[i]
+ * @param p wielomian pierwotny
+ * @param count wielkosc tablicy wielomianow
+ * @param x tablica wielomianow
+ * @return
+ */
 Poly PolyCompose(const Poly *p, unsigned count, const Poly x[]);
 
 #endif /* __POLY_H__ */
