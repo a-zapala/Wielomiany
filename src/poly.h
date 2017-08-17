@@ -1,7 +1,7 @@
 /** @file
    Interfejs klasy wielomianów
 
-   @author Jakub Pawlewicz <pan@mimuw.edu.pl>, TODO
+   @author Andrzej Zapała, 
    @copyright Uniwersytet Warszawski
    @date 2017-04-09, TODO
 */
