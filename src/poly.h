@@ -1,9 +1,9 @@
 /** @file
    Interfejs klasy wielomianów
 
-   @author Andrzej Zapała, 
+   @author Andrzej Zapała,
    @copyright Uniwersytet Warszawski
-   @date 2017-04-09, TODO
+   @date 2017-08-17
 */
 
 #ifndef __POLY_H__
@@ -20,11 +20,10 @@ typedef int poly_exp_t;
 
 /**
  * Struktura przechowująca wielomian
- * TODO
  */
-typedef struct Poly
-{
-    /* TODO */
+typedef struct Poly {
+    poly_coeff_t coeff;
+    struct List *monoList;
 } Poly;
 
 /**
@@ -33,11 +32,19 @@ typedef struct Poly
   * Współczynnik `p` może też być wielomianem.
   * Będzie on traktowany jako wielomian nad kolejną zmienną (nie nad x).
   */
-typedef struct Mono
-{
+typedef struct Mono {
     Poly p; ///< współczynnik
     poly_exp_t exp; ///< wykładnik
 } Mono;
+
+
+/**Struktura przechowujaca monomiany listy
+ *
+ */
+typedef struct List {
+    Mono m;
+    struct List * next;
+}List;
 
 /**
  * Tworzy wielomian, który jest współczynnikiem.
@@ -45,7 +52,7 @@ typedef struct Mono
  * @return wielomian
  */
 static inline Poly PolyFromCoeff(poly_coeff_t c) {
-    /* TODO */
+    return (Poly) {.coeff=c, .monoList=NULL};
 }
 
 /**
@@ -53,7 +60,7 @@ static inline Poly PolyFromCoeff(poly_coeff_t c) {
  * @return wielomian
  */
 static inline Poly PolyZero() {
-    /* TODO */
+    return PolyFromCoeff(0);
 }
 
 /**
@@ -73,7 +80,7 @@ static inline Mono MonoFromPoly(Poly *p, poly_exp_t e) {
  * @return Czy wielomian jest współczynnikiem?
  */
 static inline bool PolyIsCoeff(const Poly *p) {
-    /* TODO */
+    return p->monoList == NULL;
 }
 
 /**
@@ -82,7 +89,7 @@ static inline bool PolyIsCoeff(const Poly *p) {
  * @return Czy wielomian jest równy zero?
  */
 static inline bool PolyIsZero(const Poly *p) {
-    /* TODO */
+    return PolyIsCoeff(p) && p->coeff == 0;
 }
 
 /**
@@ -96,7 +103,7 @@ void PolyDestroy(Poly *p);
  * @param[in] m : jednomian
  */
 static inline void MonoDestroy(Mono *m) {
-    /* TODO */
+    PolyDestroy(&m->p);
 }
 
 /**
@@ -112,7 +119,7 @@ Poly PolyClone(const Poly *p);
  * @return skopiowany jednomian
  */
 static inline Mono MonoClone(const Mono *m) {
-    /* TODO */
+    return (Mono) { .p = PolyClone(&m->p) , .exp = m->exp };
 }
 
 /**
